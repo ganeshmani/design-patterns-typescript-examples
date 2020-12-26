@@ -1,11 +1,10 @@
 import express,{  Application, Request, Response } from 'express'
 // import DBInstance from './helper/DB'
 import bodyParser from 'body-parser'
-import Follower from './module/Follower'
-import Author from './module/Author'
-import Tweet from './module/Tweet'
 
-
+import Writer from './module/Writer'
+import AWSFileWriter from './module/AWSFileWriter'
+import DiskFileWriter from './module/DiskFileWriter'
 
 const app = express()
 
@@ -20,17 +19,16 @@ async function start(){
         app.post('/activate',async (req : Request,res : Response) => {
             try {
 
-                const follower1 = new Follower("Ganesh")
-                const follower2 = new Follower("Doe")
+                let size = 1000
 
-                const author = new Author()
-
-                author.subscribe(follower1)
-                author.subscribe(follower2)
-
-                author.sendTweet(
-                   new Tweet("Welcome","Bruce Lee")
-                )
+                if(size < 1000){
+                    const writer = new Writer(new DiskFileWriter())
+                    writer.write("file path comes here")
+                }
+                else{
+                    const writer = new Writer(new AWSFileWriter())
+                    writer.write("writing the file to the cloud")
+                }
 
                 res.status(200).json({ success : true,data:null })
 
