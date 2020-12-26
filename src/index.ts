@@ -1,7 +1,8 @@
 import express,{  Application, Request, Response } from 'express'
 import DBInstance from './helper/DB'
 import bodyParser from 'body-parser'
-import ErrorAdapter from './utils/ErrorAdapter'
+import UserFacade from './module/UserFacade'
+import User from './module/User'
 const app = express()
 
 async function start(){
@@ -12,10 +13,22 @@ async function start(){
         app.use(bodyParser.urlencoded({extended : true}))
         const db = await DBInstance.getInstance()
 
-        app.post('/create-user',async (req : Request,res : Response) => {
+        app.post('/activate',async (req : Request,res : Response) => {
             try {
-                const err = new ErrorAdapter("Error while creating user").serialize()
-                throw err
+                const user = new UserFacade(new User({
+                    firstName : "",
+                    lastName : "",
+                    age : 20,
+                    bankDetails : "",
+                    isActive : true,
+                    role : "ADMIN"
+                }))
+
+                const result = user.activateUserAccount("Working")
+
+                console.log("result",result)
+
+                res.status(200).json({ success : true,data:result })
             }
             catch(e){
                 console.log(e)
