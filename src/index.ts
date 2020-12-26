@@ -1,8 +1,12 @@
 import express,{  Application, Request, Response } from 'express'
-import DBInstance from './helper/DB'
+// import DBInstance from './helper/DB'
 import bodyParser from 'body-parser'
-import UserFacade from './module/UserFacade'
-import User from './module/User'
+import Follower from './module/Follower'
+import Author from './module/Author'
+import Tweet from './module/Tweet'
+
+
+
 const app = express()
 
 async function start(){
@@ -11,24 +15,25 @@ async function start(){
 
         app.use(bodyParser.json())
         app.use(bodyParser.urlencoded({extended : true}))
-        const db = await DBInstance.getInstance()
+        // const db = await DBInstance.getInstance()
 
         app.post('/activate',async (req : Request,res : Response) => {
             try {
-                const user = new UserFacade(new User({
-                    firstName : "",
-                    lastName : "",
-                    age : 20,
-                    bankDetails : "",
-                    isActive : true,
-                    role : "ADMIN"
-                }))
 
-                const result = user.activateUserAccount("Working")
+                const follower1 = new Follower("Ganesh")
+                const follower2 = new Follower("Doe")
 
-                console.log("result",result)
+                const author = new Author()
 
-                res.status(200).json({ success : true,data:result })
+                author.subscribe(follower1)
+                author.subscribe(follower2)
+
+                author.sendTweet(
+                   new Tweet("Welcome","Bruce Lee")
+                )
+
+                res.status(200).json({ success : true,data:null })
+
             }
             catch(e){
                 console.log(e)
