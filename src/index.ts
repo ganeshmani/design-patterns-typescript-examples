@@ -1,9 +1,7 @@
 import express,{  Application, Request, Response } from 'express'
 import DBInstance from './helper/DB'
 import bodyParser from 'body-parser'
-import {Macbook} from './components/Apple/Macbook'
-import {Lenovo} from './components/Lenovo/Lenovo'
-import {buildLaptop} from './components/buildLaptop'
+import UserBuilder from './module/UserBuilder'
 const app = express()
 
 async function start(){
@@ -14,23 +12,25 @@ async function start(){
         app.use(bodyParser.urlencoded({extended : true}))
         const db = await DBInstance.getInstance()
 
-        app.post('/create',async (req : Request,res : Response) => {
+        app.post('/create-user',async (req : Request,res : Response) => {
             try {
-                const size = req.body.storagesize
-                const type = req.body.type;
+                const firstName = req.body.firstName;
+                const lastName = req.body.lastName
+                const gender = req.body.gender
+                const age = req.body.age
+                const country = req.body.country
+                const address = req.body.address
+                const isAdmin = req.body.isAdmin
 
-                if(type === "Macbook"){
-                    const macLaptop = buildLaptop(new Macbook(size))
-                    res.status(200).json({ success : true,data : macLaptop.showSpecs() })
-
-                }
-                else if(type === "Lenovo"){
-                    const lenovoLaptop = buildLaptop(new Lenovo(size))
-
-                    res.status(200).json({ success : true,data : lenovoLaptop.showSpecs() })
-
-                }
-                
+                const userData = (new UserBuilder())
+                userData.setFirstName(firstName)
+                userData.setLastName(lastName)
+                userData.setGender(gender)
+                userData.setAge(age)
+                userData.setCountry(country)
+                userData.setAddress(address)
+                userData.setAdmin(isAdmin)
+                res.status(200).json({success : true, data: userData.getAllValues() })
             }
             catch(e){
                 res.status(500).json({ success : false,data : null })
